@@ -191,8 +191,9 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
     <input id="placeId" type="text" inputmode="numeric"
       placeholder="Contoh: 9058324172">
 
-    <label>Durasi Lisensi (hari)</label>
-    <input id="duration" type="number" min="1" value="30">
+   <label>Durasi Lisensi (hari)</label>
+<input id="duration" type="number" min="0" value="30" placeholder="0 = Permanen">
+<small class="muted">Isi 0 untuk lisensi permanen.</small>
 
     <button class="full" id="createBtn" onclick="createLicense()">
       BUAT LISENSI
@@ -416,11 +417,14 @@ function renderLicenses() {
     details.textContent =
       "Roblox User ID: " + (item.owner_user_id || "-") +
       "\nPlace ID: " + (item.place_id || "-") +
-      "\nDurasi: " + (item.duration_days || "-") + " hari" +
-      "\nBerakhir: " +
-      (item.expires_at
-        ? new Date(item.expires_at).toLocaleString("id-ID")
-        : "-");
+      "\\nDurasi: " +
+(Number(item.duration_days) === 0
+  ? "Permanen"
+  : item.duration_days + " hari") +
+"\\nBerakhir: " +
+(item.expires_at
+  ? new Date(item.expires_at).toLocaleString("id-ID")
+  : "Tidak pernah");
 
     card.append(title, status, details);
 
