@@ -1,0 +1,574 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AR Studio License</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --bg:#080a0f;
+  --panel:#121722;
+  --line:#293242;
+  --orange:#ff8a24;
+  --text:#f5f5f5;
+  --muted:#9ba5b5;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+}
+.container{max-width:1100px;margin:auto;padding:22px}
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 0 22px;
+  border-bottom:1px solid var(--line);
+}
+.logo{font-size:25px;font-weight:900;letter-spacing:1px}
+.logo span{color:var(--orange)}
+.small{font-size:13px;color:var(--muted)}
+.panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:20px;
+  margin-top:20px;
+}
+h2{font-size:19px;margin:0 0 15px}
+h3{font-size:16px}
+input,select{
+  width:100%;
+  background:#090d14;
+  border:1px solid #354052;
+  color:white;
+  padding:13px;
+  border-radius:8px;
+  margin-top:8px;
+  outline:none;
+}
+input:focus,select:focus{border-color:var(--orange)}
+label{display:block;font-size:13px;color:var(--muted);margin-top:12px}
+button{
+  border:0;
+  border-radius:8px;
+  padding:13px 17px;
+  background:var(--orange);
+  color:#17100a;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:12px;
+}
+button.secondary{background:#293242;color:white}
+button.danger{background:#a83232;color:white}
+button:disabled{opacity:.5;cursor:not-allowed}
+.full{width:100%}
+.hidden{display:none!important}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:14px;
+}
+.stat{
+  background:#0c111a;
+  border:1px solid var(--line);
+  padding:17px;
+  border-radius:10px;
+}
+.stat strong{display:block;font-size:25px;margin-top:8px}
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.message{margin-top:12px;color:#ffb36c;font-size:14px;overflow-wrap:anywhere}
+.card{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:15px;
+  margin-top:12px;
+  overflow-wrap:anywhere;
+}
+.card p{font-size:13px;color:var(--muted);line-height:1.6}
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  background:#173b2b;
+  color:#79e2a4;
+  font-size:12px;
+}
+.badge.revoked{background:#482323;color:#ff9c9c}
+.keybox{
+  background:#080d14;
+  border:1px dashed var(--orange);
+  padding:15px;
+  border-radius:10px;
+  margin-top:14px;
+}
+.keytext{overflow-wrap:anywhere;font-size:14px;line-height:1.6}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:30px}
+@media(max-width:500px){
+  .container{padding:13px}
+  .panel{padding:15px}
+  header{align-items:flex-start}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div class="logo">AR <span>STUDIO</span></div>
+  <div class="small">LICENSE MANAGEMENT</div>
+</header>
+
+<!-- LOGIN -->
+<section id="loginPanel" class="panel">
+  <h2>Login Administrator</h2>
+  <p class="small">Masuk menggunakan akun yang sudah terdaftar di AR Studio.</p>
+
+  <label>Email</label>
+  <input id="email" type="email" placeholder="Masukkan email">
+
+  <label>Password</label>
+  <input id="password" type="password" placeholder="Masukkan password">
+
+  <button id="loginBtn" class="full" onclick="login()">LOGIN</button>
+  <div id="loginMessage" class="message"></div>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="hidden">
+
+  <div class="panel">
+    <div class="row">
+      <div>
+        <h2>Dashboard</h2>
+        <div class="small" id="userEmail"></div>
+      </div>
+      <button class="secondary" onclick="logout()">LOGOUT</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="stat">
+      <span class="small">Total Lisensi</span>
+      <strong id="totalLicenses">-</strong>
+    </div>
+    <div class="stat">
+      <span class="small">Lisensi Aktif</span>
+      <strong id="activeLicenses">-</strong>
+    </div>
+    <div class="stat">
+      <span class="small">Lisensi Dicabut</span>
+      <strong id="revokedLicenses">-</strong>
+    </div>
+  </div>
+
+  <!-- CREATE LICENSE -->
+  <div class="panel">
+    <h2>Buat Lisensi Baru</h2>
+    <p class="small">Fitur pembuatan lisensi hanya dapat digunakan Owner.</p>
+
+    <label>Nama Produk</label>
+    <input id="product" value="AR Studio">
+
+    <label>Roblox User ID</label>
+    <input id="robloxUser" type="text" inputmode="numeric"
+      placeholder="Contoh: 5397674509">
+
+    <label>Place ID</label>
+    <input id="placeId" type="text" inputmode="numeric"
+      placeholder="Contoh: 9058324172">
+
+    <label>Durasi Lisensi (hari)</label>
+    <input id="duration" type="number" min="1" value="30">
+
+    <button class="full" id="createBtn" onclick="createLicense()">
+      BUAT LISENSI
+    </button>
+
+    <div id="createMessage" class="message"></div>
+    <div id="newKey"></div>
+  </div>
+
+  <!-- LICENSE LIST -->
+  <div class="panel">
+    <div class="row">
+      <h2>Daftar Lisensi</h2>
+      <button class="secondary" onclick="loadLicenses()">REFRESH</button>
+    </div>
+
+    <input id="search" placeholder="Cari User ID atau nama produk..."
+      oninput="renderLicenses()">
+
+    <div id="licenseList" class="small">Memuat data...</div>
+  </div>
+
+  <div id="globalMessage" class="message"></div>
+</section>
+
+<footer>AR STUDIO LICENSE SYSTEM © 2026</footer>
+</div>
+
+<script>
+// ===================================
+// KONFIGURASI SUPABASE
+// ===================================
+
+const SUPABASE_URL =
+  "https://ubawjhhgsjymjsapedvc.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_UyKjqHTRm3eirgPXoNJGGg_QlE9_gyo";
+
+const client = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+let licenseData = [];
+
+// ===================================
+// ELEMENT
+// ===================================
+
+const loginPanel = document.getElementById("loginPanel");
+const dashboard = document.getElementById("dashboard");
+
+function message(id, text) {
+  document.getElementById(id).textContent = text;
+}
+
+// ===================================
+// LOGIN
+// ===================================
+
+async function login() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const btn = document.getElementById("loginBtn");
+
+  if (!email || !password) {
+    message("loginMessage", "Email dan password wajib diisi.");
+    return;
+  }
+
+  btn.disabled = true;
+  message("loginMessage", "Sedang login...");
+
+  try {
+    const { data, error } = await client.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) throw error;
+
+    await openDashboard(data.user);
+
+  } catch (error) {
+    message("loginMessage", "Login gagal: " + error.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ===================================
+// OPEN DASHBOARD
+// ===================================
+
+async function openDashboard(user) {
+  loginPanel.classList.add("hidden");
+  dashboard.classList.remove("hidden");
+
+  document.getElementById("userEmail").textContent =
+    user.email || "Administrator";
+
+  await loadLicenses();
+}
+
+// ===================================
+// LOGOUT
+// ===================================
+
+async function logout() {
+  await client.auth.signOut();
+  licenseData = [];
+
+  dashboard.classList.add("hidden");
+  loginPanel.classList.remove("hidden");
+
+  document.getElementById("password").value = "";
+  message("loginMessage", "Kamu sudah logout.");
+}
+
+// ===================================
+// CALL EDGE FUNCTION
+// ===================================
+
+async function callAPI(payload) {
+  const { data, error } = await client.functions.invoke(
+    "ar-license",
+    { body: payload }
+  );
+
+  if (error) throw error;
+  if (data && data.error) throw new Error(data.error);
+
+  return data;
+}
+
+// ===================================
+// LOAD LICENSES
+// ===================================
+
+async function loadLicenses() {
+  const list = document.getElementById("licenseList");
+  list.textContent = "Memuat data lisensi...";
+
+  try {
+    const data = await callAPI({ action: "list" });
+
+    licenseData = Array.isArray(data.licenses)
+      ? data.licenses
+      : [];
+
+    updateStats();
+    renderLicenses();
+
+    message("globalMessage", "Data berhasil diperbarui.");
+
+  } catch (error) {
+    list.textContent = "Gagal mengambil data: " + error.message;
+  }
+}
+
+// ===================================
+// STATISTICS
+// ===================================
+
+function updateStats() {
+  const total = licenseData.length;
+  const active = licenseData.filter(
+    item => item.status === "active"
+  ).length;
+  const revoked = licenseData.filter(
+    item => item.status === "revoked"
+  ).length;
+
+  document.getElementById("totalLicenses").textContent = total;
+  document.getElementById("activeLicenses").textContent = active;
+  document.getElementById("revokedLicenses").textContent = revoked;
+}
+
+// ===================================
+// RENDER LICENSE LIST
+// ===================================
+
+function renderLicenses() {
+  const list = document.getElementById("licenseList");
+  const search = document.getElementById("search")
+    .value.toLowerCase().trim();
+
+  list.innerHTML = "";
+
+  const filtered = licenseData.filter(item => {
+    const text = [
+      item.product_name,
+      item.owner_user_id,
+      item.place_id,
+      item.status
+    ].join(" ").toLowerCase();
+
+    return text.includes(search);
+  });
+
+  if (!filtered.length) {
+    list.textContent = "Lisensi tidak ditemukan.";
+    return;
+  }
+
+  filtered.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const title = document.createElement("h3");
+    title.textContent = item.product_name || "AR Studio";
+
+    const status = document.createElement("span");
+    status.className = item.status === "active"
+      ? "badge"
+      : "badge revoked";
+    status.textContent = item.status || "unknown";
+
+    const details = document.createElement("p");
+    details.textContent =
+      "Roblox User ID: " + (item.owner_user_id || "-") +
+      "\nPlace ID: " + (item.place_id || "-") +
+      "\nDurasi: " + (item.duration_days || "-") + " hari" +
+      "\nBerakhir: " +
+      (item.expires_at
+        ? new Date(item.expires_at).toLocaleString("id-ID")
+        : "-");
+
+    card.append(title, status, details);
+
+    if (item.status === "active") {
+      const revoke = document.createElement("button");
+      revoke.className = "danger full";
+      revoke.textContent = "CABUT LISENSI";
+
+      revoke.onclick = () => revokeLicense(item.id);
+      card.appendChild(revoke);
+    }
+
+    list.appendChild(card);
+  });
+}
+
+// ===================================
+// CREATE LICENSE
+// ===================================
+
+async function createLicense() {
+  const btn = document.getElementById("createBtn");
+
+  const product_name =
+    document.getElementById("product").value.trim();
+
+  const user_id =
+    document.getElementById("robloxUser").value.trim();
+
+  const place_id =
+    document.getElementById("placeId").value.trim();
+
+  const duration_days =
+    Number(document.getElementById("duration").value);
+
+  document.getElementById("newKey").innerHTML = "";
+  message("createMessage", "");
+
+  if (!product_name || !user_id || !place_id ||
+      !/^\d+$/.test(user_id) ||
+      !/^\d+$/.test(place_id) ||
+      !Number.isInteger(duration_days) ||
+      duration_days < 1) {
+    message("createMessage", "Periksa kembali semua data.");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "MEMBUAT LISENSI...";
+
+  try {
+    const data = await callAPI({
+      action: "create",
+      user_id,
+      place_id,
+      duration_days,
+      product_name
+    });
+
+    const key = data.license_key;
+
+    if (!key) {
+      throw new Error(
+        "Lisensi dibuat tetapi key tidak ditemukan pada respons server."
+      );
+    }
+
+    const box = document.createElement("div");
+    box.className = "keybox";
+
+    const title = document.createElement("b");
+    title.textContent = "LICENSE KEY BARU";
+
+    const keyText = document.createElement("p");
+    keyText.className = "keytext";
+    keyText.textContent = key;
+
+    const copy = document.createElement("button");
+    copy.className = "full";
+    copy.textContent = "SALIN LICENSE KEY";
+    copy.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(key);
+        copy.textContent = "BERHASIL DISALIN";
+      } catch {
+        keyText.textContent = key;
+        message("createMessage", "Pilih dan salin key secara manual.");
+      }
+    };
+
+    const warning = document.createElement("p");
+    warning.className = "small";
+    warning.textContent =
+      "Simpan key ini dengan aman. Key hanya ditampilkan saat dibuat.";
+
+    box.append(title, keyText, copy, warning);
+    document.getElementById("newKey").appendChild(box);
+
+    message("createMessage", "Lisensi berhasil dibuat.");
+    await loadLicenses();
+
+  } catch (error) {
+    message("createMessage", "Gagal: " + error.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "BUAT LISENSI";
+  }
+}
+
+// ===================================
+// REVOKE LICENSE
+// ===================================
+
+async function revokeLicense(id) {
+  if (!confirm("Yakin ingin mencabut lisensi ini?")) return;
+
+  try {
+    await callAPI({
+      action: "revoke",
+      license_id: id
+    });
+
+    message("globalMessage", "Lisensi berhasil dicabut.");
+    await loadLicenses();
+
+  } catch (error) {
+    message("globalMessage", "Gagal mencabut: " + error.message);
+  }
+}
+
+// ===================================
+// CHECK EXISTING SESSION
+// ===================================
+
+async function init() {
+  const { data, error } = await client.auth.getSession();
+
+  if (error) {
+    message("loginMessage", error.message);
+    return;
+  }
+
+  if (data.session) {
+    await openDashboard(data.session.user);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
