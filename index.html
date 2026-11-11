@@ -463,7 +463,7 @@ async function createLicense() {
       !/^\d+$/.test(user_id) ||
       !/^\d+$/.test(place_id) ||
       !Number.isInteger(duration_days) ||
-      duration_days < 1) {
+      duration_days < 0) {
     message("createMessage", "Periksa kembali semua data.");
     return;
   }
